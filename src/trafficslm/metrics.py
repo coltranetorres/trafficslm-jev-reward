@@ -1,4 +1,4 @@
-"""Evaluation metrics (pure stdlib)."""
+"""Road-name normalization and bootstrap CI (pure stdlib)."""
 from __future__ import annotations
 
 import json
@@ -9,12 +9,9 @@ from collections.abc import Callable
 from functools import lru_cache
 from pathlib import Path
 
-from trafficslm.schema import Location
-
 ALIASES_PATH = Path(__file__).resolve().parents[2] / "data" / "aliases.json"
 NAN = float("nan")
 _ABBREV = {"ave": "avenue", "blvd": "boulevard", "hwy": "highway", "hway": "highway"}
-FIELDS = ("road", "landmark", "direction")
 
 
 def _base(s: str | None) -> str | None:
@@ -48,72 +45,6 @@ def normalize(s: str | None, aliases_path: str | None = None) -> str | None:
     if b is None:
         return None
     return load_aliases(aliases_path).get(b, b)
-
-
-def accuracy(gold: list[str], pred: list[str | None]) -> float:
-    if not gold:
-        return NAN
-    return sum(g == p for g, p in zip(gold, pred)) / len(gold)
-
-
-def macro_f1(gold: list[str], pred: list[str | None],
-             exclude: frozenset[str] = frozenset()) -> float:
-    classes = set(gold) - set(exclude)
-    if not classes:
-        return NAN
-    total = 0.0
-    for c in classes:
-        tp = sum(g == c and p == c for g, p in zip(gold, pred))
-        fp = sum(g != c and p == c for g, p in zip(gold, pred))
-        fn = sum(g == c and p != c for g, p in zip(gold, pred))
-        d = 2 * tp + fp + fn
-        total += 2 * tp / d if d else 0.0
-    return total / len(classes)
-
-
-def _field(loc: Location, f: str) -> str | None:
-    return normalize(getattr(loc, f))
-
-
-def location_scores(gold: list[Location], pred: list[Location | None]) -> dict[str, float]:
-    if not gold:
-        return {k: NAN for k in ("f1", "road_acc", "landmark_acc", "direction_acc")}
-    tp = fp = fn = 0
-    correct = {f: 0 for f in FIELDS}
-    for g, p in zip(gold, pred):
-        for f in FIELDS:
-            gv = _field(g, f)
-            if p is None:
-                fn += gv is not None
-                continue
-            pv = _field(p, f)
-            correct[f] += gv == pv
-            if pv is None:
-                fn += gv is not None
-            elif pv == gv:
-                tp += 1
-            else:
-                fp += 1
-                fn += gv is not None
-    d = 2 * tp + fp + fn
-    out = {"f1": 2 * tp / d if d else 1.0}
-    for f in FIELDS:
-        out[f"{f}_acc"] = correct[f] / len(gold)
-    return out
-
-
-def abstention_rate(gold: list[Location], pred: list[Location | None]) -> float:
-    """Share of gold-null location fields correctly left null (invalid = failure).
-
-    nan if there are no gold-null fields.
-    """
-    total = ok = 0
-    for g, p in zip(gold, pred):
-        for f in FIELDS:
-            if _field(g, f) is None:
-                total += 1
-                ok += p is not None and _field(p, f) is None
-    return ok / total if total else NAN
 
 
 def bootstrap_ci(metric_on_indices: Callable[[list[int]], float], n_items: int,

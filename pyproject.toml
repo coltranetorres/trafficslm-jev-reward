@@ -1,15 +1,16 @@
 [project]
 name = "trafficslm"
 version = "0.1.0"
-description = "Add your description here"
+description = "How closely can a decision model (Jev) judge extraction outputs without seeing the gold label, and where does it break?"
 authors = [
     { name = "Cole", email = "coltranetorres@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
     "matplotlib>=3.11.2",
-    "mlx-lm>=0.32.2",
     "pydantic>=2",
+    "python-dotenv>=1.0",
+    "requests>=2.31",
 ]
 
 [build-system]

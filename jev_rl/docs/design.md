@@ -41,7 +41,7 @@ question is empirical (fidelity and failure modes), not a recipe. A tutorial may
 - Freeze rule applies: do not edit `data/`, stored predictions or `results*.json`. New outputs go under
   `jev_rl/results/` and new scripts under `jev_rl/scripts/`.
 - Question wording is developed on **validation only**, then frozen and run once on test.
-- Limits to state in the write-up: small n, one seed, synthetic text, label noise acknowledged in `research/findings.md`.
+- Limits to state in the write-up: small n, one seed, synthetic text, label noise acknowledged in the original fine-tuning study (not included in this repo).
 - API: key in `.env` via `load_dotenv()`. `.env` is currently untracked and not git-ignored; add it to `.gitignore`
   before any commit. Run with `uv run --with python-dotenv --with requests` unless Cole wants them added to
   `pyproject.toml`. Cache every response to disk so reruns cost nothing. Check Jev pricing before the test run.

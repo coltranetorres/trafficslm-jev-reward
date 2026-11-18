@@ -1,0 +1,21 @@
+{
+  "incident_type": {
+    "type": "choice",
+    "choice": "vehicle_breakdown",
+    "probabilities": {
+      "flooding": 0,
+      "heavy_traffic": 0,
+      "other": 0.02,
+      "road_accident": 0.06,
+      "road_closure": 0.01,
+      "road_hazard": 0.23,
+      "unknown": 0.03,
+      "vehicle_breakdown": 0.65
+    },
+    "confidence": 0.6
+  },
+  "road_match": {
+    "type": "noul",
+    "noul": 0.98
+  }
+}
